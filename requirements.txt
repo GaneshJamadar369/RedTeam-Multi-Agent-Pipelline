@@ -1,10 +1,15 @@
 # Core LLM and API interactions
 openai>=1.0.0
 requests>=2.31.0
+python-dotenv>=1.0.0
 
-# Terminal Observability (Currently used)
+# Rich terminal UI
 rich>=13.0.0
 
-# UI-Based LLM/Agent Observability (Recommended: Arize Phoenix)
-arize-phoenix>=4.0.0
+# Phoenix OTEL client (lightweight – sends traces to a separately running Phoenix server)
+# To start the Phoenix UI server run:  phoenix serve
+arize-phoenix-otel>=0.16.1
 openinference-instrumentation-openai>=0.1.0
+
+# Full Phoenix server (install this too so you can run `phoenix serve`)
+arize-phoenix>=4.0.0

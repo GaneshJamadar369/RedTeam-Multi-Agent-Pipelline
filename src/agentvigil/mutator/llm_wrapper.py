@@ -21,6 +21,14 @@ class LLMWrapper:
             self.client = None # Use requests for local endpoint
         elif os.environ.get("OPENAI_API_KEY"):
             self.client = OpenAI()
+        elif os.environ.get("GROQ_API"):
+            self.client = OpenAI(
+                api_key=os.environ.get("GROQ_API"),
+                base_url="https://api.groq.com/openai/v1"
+            )
+            # Override model to a fast Groq model by default if using Groq
+            if self.model_name == "gpt-4o-mini":
+                self.model_name = "llama-3.1-8b-instant"
         else:
             self.client = None
         
