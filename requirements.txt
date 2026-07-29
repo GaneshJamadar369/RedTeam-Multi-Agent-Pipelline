@@ -1,0 +1,10 @@
+# Core LLM and API interactions
+openai>=1.0.0
+requests>=2.31.0
+
+# Terminal Observability (Currently used)
+rich>=13.0.0
+
+# UI-Based LLM/Agent Observability (Recommended: Arize Phoenix)
+arize-phoenix>=4.0.0
+openinference-instrumentation-openai>=0.1.0

@@ -14,6 +14,10 @@ class AgentRunner:
         Simulates running the target agent with the injected seed.
         Returns True if the indirect prompt injection was successful.
         """
+        import logging
+        logging.info(f"[AGENT INPUT] Task: '{task.user_task}' | Target: '{task.injection_target}'")
+        logging.info(f"[AGENT INJECTION] Seeding text:\n{seed.text}")
+        
         # In a real environment, this would format the environment state
         # with the seed, run the agent, and check if the attacker's goal
         # was achieved (e.g. data exfiltration).
@@ -24,4 +28,6 @@ class AgentRunner:
         length_bonus = min(0.2, len(seed.text) / 1000.0) 
         success_chance = base_chance + length_bonus
         
-        return random.random() < success_chance
+        result = random.random() < success_chance
+        logging.info(f"[AGENT OUTPUT] Injection successful: {result}")
+        return result

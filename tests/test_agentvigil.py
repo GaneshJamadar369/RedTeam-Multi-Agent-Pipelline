@@ -1,5 +1,25 @@
 import os
 import sys
+import logging
+try:
+    from rich.logging import RichHandler
+    from rich.console import Console
+    from rich.panel import Panel
+except ImportError:
+    print("Please install 'rich' library via `pip install rich` for enhanced observability.")
+    sys.exit(1)
+
+# Override any existing logging configs
+for handler in logging.root.handlers[:]:
+    logging.root.removeHandler(handler)
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(message)s",
+    datefmt="[%X]",
+    handlers=[RichHandler(rich_tracebacks=True, show_path=True, markup=True)]
+)
+console = Console()
 
 # Add the src directory to the path so we can import our modules
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
@@ -15,7 +35,8 @@ from agentvigil.corpus.template_loader import TemplateLoader
 
 
 def test_end_to_end_fuzzing():
-    print("Setting up REAL AGENTVIGIL test environment...")
+    console.print(Panel.fit("[bold green]Starting AGENTVIGIL Observability Test Environment[/bold green]", title="AgentVigil"))
+
     
     # Check for API key (Required for real execution)
     api_key_present = "OPENAI_API_KEY" in os.environ
@@ -68,15 +89,46 @@ def test_end_to_end_fuzzing():
         num_mutations_per_iter=2
     )
     
-    print("\n--- Test Results ---")
+    print("\n" + "="*60)
+    print("--- 100% OBSERVABILITY SUMMARY ---")
+    print("="*60)
+    
+    print("\n[1] AGENT WORKING MECHANISM")
+    print(f"Target Agent: {type(agent_env).__name__}")
+    print("Operation: This agent receives a benign user task and an injected malicious prompt (seed).")
+    print("Feedback: It returns True if the injection successfully misleads the agent to achieve the attacker's goal.")
+    
+    print("\n[2] PROMPT GENERATION METRICS")
+    all_nodes = list(framework.selector.nodes)
+    print(f"Total Prompts (Seeds) Generated & Evaluated: {len(all_nodes)}")
+    print(f"Initial Corpus Size: {len(initial_seeds)}")
+    print(f"Mutations Performed: {len(all_nodes) - len(initial_seeds)}")
+    
+    print("\n[3] INDIVIDUAL PROMPT SCORES (Ranked)")
+    # Sort nodes by score descending
+    all_nodes.sort(key=lambda x: (x.score if x.score is not None else 0), reverse=True)
+    
+    for i, node in enumerate(all_nodes):
+        score = node.score if node.score is not None else 0.0
+        short_text = (node.text[:60] + '...') if len(node.text) > 60 else node.text
+        short_text = short_text.replace('\n', ' ')
+        history = " -> ".join(node.mutation_history) if node.mutation_history else "Initial Template"
+        print(f"  #{i+1} | Score: {score:.2f} | {history}")
+        print(f"       Preview: {short_text}")
+        
+    print("\n[4] BEST PERFORMING PROMPT")
     if best_seed:
-        print(f"Best Seed ID: {best_seed.id}")
-        print(f"Best Seed Score: {best_seed.score:.2f}")
-        print(f"Mutation History: {best_seed.mutation_history}")
-        print(f"\nBest Seed Text:\n{best_seed.text}\n")
+        print(f"ID: {best_seed.id}")
+        print(f"Score: {best_seed.score:.2f}")
+        print(f"Mutation Path: {' -> '.join(best_seed.mutation_history) if best_seed.mutation_history else 'Initial Template'}")
+        print("Full Prompt Text:")
+        print("-" * 50)
+        print(best_seed.text)
+        print("-" * 50)
     else:
         print("No successful seeds found.")
         
+    print("\n" + "="*60)
     print("End-to-end real fuzzing test completed successfully.")
     print("State saved to agentvigil_results.json.")
 

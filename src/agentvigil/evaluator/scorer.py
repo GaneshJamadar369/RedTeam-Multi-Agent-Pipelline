@@ -22,6 +22,8 @@ class Scorer:
         Returns:
             The final computed score for the seed.
         """
+        import logging
+        logging.info(f"Starting evaluation for seed ID: {seed.id}")
         total_success = 0
         num_questions = 0
         coverage_bonus = 0

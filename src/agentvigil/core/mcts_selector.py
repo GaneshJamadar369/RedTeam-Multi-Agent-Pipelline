@@ -23,7 +23,10 @@ class MCTSSelector:
         Algorithm 2: MCTS-based seed selection
         Selects top `n` nodes based on UCB score.
         """
+        import logging
+        logging.info(f"Executing MCTS select for top {n} seeds out of {len(self.nodes)} total nodes.")
         if not self.nodes:
+            logging.warning("No nodes available to select from in MCTS.")
             return []
             
         total_visits = sum(node.visits for node in self.nodes)
@@ -36,6 +39,7 @@ class MCTSSelector:
         
         # Select top n
         selected_nodes = [node for _, node in scored_nodes[:n]]
+        logging.info(f"MCTS Selected seed IDs: {[node.id for node in selected_nodes]}")
         return selected_nodes
 
     def update(self, node: Seed):

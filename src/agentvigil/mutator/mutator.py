@@ -45,15 +45,20 @@ class Mutator:
         return self._create_child(seed, new_text, "GenerateSimilar")
 
     def mutate(self, seeds: List[Seed]) -> List[Seed]:
+        import logging
+        logging.info(f"Executing mutation on {len(seeds)} seed(s).")
         mutated_seeds = []
         if len(seeds) >= 2 and random.random() < 0.2:
             s1, s2 = random.sample(seeds, 2)
+            logging.info(f"Applying strategy: Crossover between {s1.id} and {s2.id}")
             mutated_seeds.append(self.crossover(s1, s2))
         else:
             for seed in seeds:
                 strategy = random.choice(self.strategies)
+                logging.info(f"Applying strategy: {strategy.__name__} on seed {seed.id}")
                 mutated_seeds.append(strategy(seed))
                 
+        logging.info(f"Mutation complete. Generated {len(mutated_seeds)} new variant(s).")
         return mutated_seeds
 
     def _create_child(self, parent: Seed, new_text: str, mutation_name: str) -> Seed:

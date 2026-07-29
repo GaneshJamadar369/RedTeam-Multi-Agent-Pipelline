@@ -1,12 +1,15 @@
-from typing import List, Dict
 import logging
+from typing import List, Dict
 from .data_models import Seed, Task
 from .mcts_selector import MCTSSelector
 from ..mutator.mutator import Mutator
 from ..evaluator.scorer import Scorer
 from ..agent.agent_runner import AgentRunner
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, 
+    format='\n%(asctime)s | %(levelname)s | File: %(pathname)s | Func: %(funcName)s()\n -> %(message)s'
+)
 
 
 class AgentVigil:
